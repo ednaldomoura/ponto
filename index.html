@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Ponto de Funcionário</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Sistema de Ponto</h1>
+        <form id="pontoForm">
+            <input type="text" id="nome" placeholder="Nome do Funcionário" required>
+            <input type="time" id="entrada" placeholder="Entrada">
+            <input type="time" id="saidaAlmoco" placeholder="Saída Almoço">
+            <input type="time" id="entradaAlmoco" placeholder="Entrada Almoço">
+            <input type="time" id="saida" placeholder="Saída">
+            <label style="display:flex;align-items:center;gap:4px;font-size:0.98em;margin:6px 0 0 0;">
+                <input type="checkbox" id="folga"> Dia de folga
+            </label>
+            <label style="display:flex;align-items:center;gap:4px;font-size:0.98em;margin:2px 0 0 0;">
+                <input type="checkbox" id="ferias"> Funcionário de férias
+            </label>
+            <button type="submit">Registrar Ponto</button>
+        </form>
+        <div class="botoes-exportar">
+            <button id="exportarCSV">Exportar CSV</button>
+            <button id="exportarPDF">Exportar PDF</button>
+        </div>
+        <table id="tabelaPonto">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Data</th>
+                    <th>Entrada</th>
+                    <th>Saída Almoço</th>
+                    <th>Entrada Almoço</th>
+                    <th>Saída</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Registros de ponto aparecerão aqui -->
+            </tbody>
+        </table>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
