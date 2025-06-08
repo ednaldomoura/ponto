@@ -10,6 +10,7 @@ const feriasInput = document.getElementById('ferias');
 const tabelaPonto = document.getElementById('tabelaPonto').getElementsByTagName('tbody')[0];
 const exportarCSV = document.getElementById('exportarCSV');
 const exportarPDF = document.getElementById('exportarPDF');
+const enviarEmail = document.getElementById('enviarEmail');
 
 let registros = JSON.parse(localStorage.getItem('registrosPonto') || '[]');
 
@@ -173,6 +174,27 @@ exportarPDF.addEventListener('click', function() {
         }
     });
     doc.save('registros_ponto.pdf');
+});
+
+enviarEmail.addEventListener('click', function() {
+    // Gera o CSV como string
+    let csv = 'Nome,Data,Entrada,Saída Almoço,Entrada Almoço,Saída,Folga,Férias\n';
+    registros.forEach(reg => {
+        csv += `${reg.nome},${reg.data},${reg.entrada || ''},${reg.saidaAlmoco || ''},${reg.entradaAlmoco || ''},${reg.saida || ''},${reg.folga ? 'Sim' : ''},${reg.ferias ? 'Sim' : ''}\n`;
+    });
+    // Cria um blob e um link temporário para download
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    // Baixa o arquivo automaticamente
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'registros_ponto.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+    // Abre o Gmail em nova aba
+    const subject = encodeURIComponent('Registros de Ponto');
+    const body = encodeURIComponent('Segue em anexo o arquivo de registros de ponto.\n\nObs: O arquivo CSV foi baixado automaticamente. Anexe-o manualmente ao e-mail no Gmail.');
+    window.open(`https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${body}`,'_blank');
 });
 
 renderTabela();
