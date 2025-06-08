@@ -1,5 +1,6 @@
 const pontoForm = document.getElementById('pontoForm');
 const nomeInput = document.getElementById('nome');
+const dataInput = document.getElementById('data');
 const entradaInput = document.getElementById('entrada');
 const saidaAlmocoInput = document.getElementById('saidaAlmoco');
 const entradaAlmocoInput = document.getElementById('entradaAlmoco');
@@ -58,6 +59,7 @@ function renderTabela() {
 function editarRegistro(idx) {
     const reg = registros[idx];
     nomeInput.value = reg.nome;
+    dataInput.value = reg.data ? reg.data.split('/').reverse().join('-') : '';
     entradaInput.value = reg.entrada || '';
     saidaAlmocoInput.value = reg.saidaAlmoco || '';
     entradaAlmocoInput.value = reg.entradaAlmoco || '';
@@ -70,9 +72,8 @@ function editarRegistro(idx) {
 pontoForm.addEventListener('submit', function(e) {
     e.preventDefault();
     const nome = nomeInput.value.trim();
-    if (!nome) return;
-    const agora = new Date();
-    const data = agora.toLocaleDateString('pt-BR');
+    const data = dataInput.value ? dataInput.value.split('-').reverse().join('/') : '';
+    if (!nome || !data) return;
     let idx = pontoForm.getAttribute('data-edit');
     let registro;
     if (idx !== null) {
@@ -111,6 +112,7 @@ pontoForm.addEventListener('submit', function(e) {
     localStorage.setItem('registrosPonto', JSON.stringify(registros));
     renderTabela();
     nomeInput.value = '';
+    dataInput.value = '';
     entradaInput.value = '';
     saidaAlmocoInput.value = '';
     entradaAlmocoInput.value = '';
