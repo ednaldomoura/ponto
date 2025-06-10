@@ -10,7 +10,6 @@ const feriasInput = document.getElementById('ferias');
 const descansoInput = document.getElementById('descanso');
 const faltaInput = document.getElementById('falta');
 const funcaoInput = document.getElementById('funcao');
-const funcaoCheck = document.getElementById('funcaoCheck');
 const funcaoTexto = document.getElementById('funcaoTexto');
 const tabelaPonto = document.getElementById('tabelaPonto').getElementsByTagName('tbody')[0];
 const exportarCSV = document.getElementById('exportarCSV');
@@ -18,12 +17,6 @@ const exportarPDF = document.getElementById('exportarPDF');
 const enviarEmail = document.getElementById('enviarEmail');
 
 let registros = JSON.parse(localStorage.getItem('registrosPonto') || '[]');
-
-// Exibe o campo de texto da função apenas se o checkbox estiver marcado
-funcaoCheck.addEventListener('change', function() {
-    funcaoTexto.style.display = funcaoCheck.checked ? 'block' : 'none';
-    if (!funcaoCheck.checked) funcaoTexto.value = '';
-});
 
 function renderTabela() {
     tabelaPonto.innerHTML = '';
@@ -39,6 +32,8 @@ function renderTabela() {
             feriasCell.style.fontWeight = 'bold';
             row.insertCell(3);
             row.insertCell(4);
+            row.insertCell(5);
+            row.insertCell(6).textContent = reg.funcaoTexto || '';
         } else if (reg.folga) {
             const folgaCell = row.insertCell(2);
             folgaCell.colSpan = 4;
@@ -47,6 +42,8 @@ function renderTabela() {
             folgaCell.style.fontWeight = 'bold';
             row.insertCell(3);
             row.insertCell(4);
+            row.insertCell(5);
+            row.insertCell(6).textContent = reg.funcaoTexto || '';
         } else if (reg.descanso) {
             const descansoCell = row.insertCell(2);
             descansoCell.colSpan = 4;
@@ -55,6 +52,8 @@ function renderTabela() {
             descansoCell.style.fontWeight = 'bold';
             row.insertCell(3);
             row.insertCell(4);
+            row.insertCell(5);
+            row.insertCell(6).textContent = reg.funcaoTexto || '';
         } else if (reg.falta) {
             const faltaCell = row.insertCell(2);
             faltaCell.colSpan = 4;
@@ -63,19 +62,14 @@ function renderTabela() {
             faltaCell.style.fontWeight = 'bold';
             row.insertCell(3);
             row.insertCell(4);
-        } else if (reg.funcao) {
-            const funcaoCell = row.insertCell(2);
-            funcaoCell.colSpan = 4;
-            funcaoCell.textContent = 'FUNÇÃO: ' + (reg.funcaoTexto || '');
-            funcaoCell.style.color = '#6c5ce7';
-            funcaoCell.style.fontWeight = 'bold';
-            row.insertCell(3);
-            row.insertCell(4);
+            row.insertCell(5);
+            row.insertCell(6).textContent = reg.funcaoTexto || '';
         } else {
             row.insertCell(2).textContent = reg.entrada || '';
             row.insertCell(3).textContent = reg.saidaAlmoco || '';
             row.insertCell(4).textContent = reg.entradaAlmoco || '';
             row.insertCell(5).textContent = reg.saida || '';
+            row.insertCell(6).textContent = reg.funcaoTexto || '';
         }
         // Botão Editar
         const editCell = row.insertCell(-1);
@@ -116,8 +110,6 @@ function editarRegistro(idx) {
     feriasInput.checked = !!reg.ferias;
     descansoInput.checked = !!reg.descanso;
     faltaInput.checked = !!reg.falta;
-    funcaoCheck.checked = !!reg.funcao;
-    funcaoTexto.style.display = reg.funcao ? 'block' : 'none';
     funcaoTexto.value = reg.funcaoTexto || '';
     pontoForm.setAttribute('data-edit', idx);
 }
@@ -148,72 +140,22 @@ pontoForm.addEventListener('submit', function(e) {
             registros.push(registro);
         }
     }
-    if (feriasInput.checked) {
-        registro.ferias = true;
-        registro.folga = false;
-        registro.descanso = false;
-        registro.falta = false;
-        registro.funcao = false;
-        registro.funcaoTexto = '';
-        registro.entrada = '';
-        registro.saidaAlmoco = '';
-        registro.entradaAlmoco = '';
-        registro.saida = '';
-    } else if (folgaInput.checked) {
-        registro.folga = true;
-        registro.ferias = false;
-        registro.descanso = false;
-        registro.falta = false;
-        registro.funcao = false;
-        registro.funcaoTexto = '';
-        registro.entrada = '';
-        registro.saidaAlmoco = '';
-        registro.entradaAlmoco = '';
-        registro.saida = '';
-    } else if (descansoInput.checked) {
-        registro.descanso = true;
-        registro.ferias = false;
-        registro.folga = false;
-        registro.falta = false;
-        registro.funcao = false;
-        registro.funcaoTexto = '';
-        registro.entrada = '';
-        registro.saidaAlmoco = '';
-        registro.entradaAlmoco = '';
-        registro.saida = '';
-    } else if (faltaInput.checked) {
-        registro.falta = true;
-        registro.ferias = false;
-        registro.folga = false;
-        registro.descanso = false;
-        registro.funcao = false;
-        registro.funcaoTexto = '';
-        registro.entrada = '';
-        registro.saidaAlmoco = '';
-        registro.entradaAlmoco = '';
-        registro.saida = '';
-    } else if (funcaoCheck.checked) {
-        registro.funcao = true;
-        registro.funcaoTexto = funcaoTexto.value.trim();
-        registro.ferias = false;
-        registro.folga = false;
-        registro.descanso = false;
-        registro.falta = false;
+    registro.ferias = !!feriasInput.checked;
+    registro.folga = !!folgaInput.checked;
+    registro.descanso = !!descansoInput.checked;
+    registro.falta = !!faltaInput.checked;
+    registro.funcaoTexto = funcaoTexto.value.trim();
+    // Se algum especial estiver marcado, limpa os horários
+    if (registro.ferias || registro.folga || registro.descanso || registro.falta) {
         registro.entrada = '';
         registro.saidaAlmoco = '';
         registro.entradaAlmoco = '';
         registro.saida = '';
     } else {
-        registro.folga = false;
-        registro.ferias = false;
-        registro.descanso = false;
-        registro.falta = false;
-        registro.funcao = false;
-        registro.funcaoTexto = '';
-        if (entradaInput.value) registro.entrada = entradaInput.value;
-        if (saidaAlmocoInput.value) registro.saidaAlmoco = saidaAlmocoInput.value;
-        if (entradaAlmocoInput.value) registro.entradaAlmoco = entradaAlmocoInput.value;
-        if (saidaInput.value) registro.saida = saidaInput.value;
+        registro.entrada = entradaInput.value || '';
+        registro.saidaAlmoco = saidaAlmocoInput.value || '';
+        registro.entradaAlmoco = entradaAlmocoInput.value || '';
+        registro.saida = saidaInput.value || '';
     }
     localStorage.setItem('registrosPonto', JSON.stringify(registros));
     renderTabela();
@@ -227,9 +169,7 @@ pontoForm.addEventListener('submit', function(e) {
     feriasInput.checked = false;
     descansoInput.checked = false;
     faltaInput.checked = false;
-    funcaoCheck.checked = false;
     funcaoTexto.value = '';
-    funcaoTexto.style.display = 'none';
     pontoForm.removeAttribute('data-edit');
 });
 
