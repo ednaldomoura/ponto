@@ -9,6 +9,7 @@ const folgaInput = document.getElementById('folga');
 const feriasInput = document.getElementById('ferias');
 const descansoInput = document.getElementById('descanso');
 const faltaInput = document.getElementById('falta');
+const funcaoInput = document.getElementById('funcao');
 const tabelaPonto = document.getElementById('tabelaPonto').getElementsByTagName('tbody')[0];
 const exportarCSV = document.getElementById('exportarCSV');
 const exportarPDF = document.getElementById('exportarPDF');
@@ -52,6 +53,14 @@ function renderTabela() {
             faltaCell.textContent = 'FALTA';
             faltaCell.style.color = '#d63031';
             faltaCell.style.fontWeight = 'bold';
+            row.insertCell(3);
+            row.insertCell(4);
+        } else if (reg.funcao) {
+            const funcaoCell = row.insertCell(2);
+            funcaoCell.colSpan = 4;
+            funcaoCell.textContent = 'FUNÇÃO';
+            funcaoCell.style.color = '#6c5ce7';
+            funcaoCell.style.fontWeight = 'bold';
             row.insertCell(3);
             row.insertCell(4);
         } else {
@@ -99,6 +108,7 @@ function editarRegistro(idx) {
     feriasInput.checked = !!reg.ferias;
     descansoInput.checked = !!reg.descanso;
     faltaInput.checked = !!reg.falta;
+    funcaoInput.checked = !!reg.funcao;
     pontoForm.setAttribute('data-edit', idx);
 }
 
@@ -133,6 +143,7 @@ pontoForm.addEventListener('submit', function(e) {
         registro.folga = false;
         registro.descanso = false;
         registro.falta = false;
+        registro.funcao = false;
         registro.entrada = '';
         registro.saidaAlmoco = '';
         registro.entradaAlmoco = '';
@@ -142,6 +153,7 @@ pontoForm.addEventListener('submit', function(e) {
         registro.ferias = false;
         registro.descanso = false;
         registro.falta = false;
+        registro.funcao = false;
         registro.entrada = '';
         registro.saidaAlmoco = '';
         registro.entradaAlmoco = '';
@@ -151,6 +163,7 @@ pontoForm.addEventListener('submit', function(e) {
         registro.ferias = false;
         registro.folga = false;
         registro.falta = false;
+        registro.funcao = false;
         registro.entrada = '';
         registro.saidaAlmoco = '';
         registro.entradaAlmoco = '';
@@ -160,6 +173,17 @@ pontoForm.addEventListener('submit', function(e) {
         registro.ferias = false;
         registro.folga = false;
         registro.descanso = false;
+        registro.funcao = false;
+        registro.entrada = '';
+        registro.saidaAlmoco = '';
+        registro.entradaAlmoco = '';
+        registro.saida = '';
+    } else if (funcaoInput.checked) {
+        registro.funcao = true;
+        registro.ferias = false;
+        registro.folga = false;
+        registro.descanso = false;
+        registro.falta = false;
         registro.entrada = '';
         registro.saidaAlmoco = '';
         registro.entradaAlmoco = '';
@@ -169,6 +193,7 @@ pontoForm.addEventListener('submit', function(e) {
         registro.ferias = false;
         registro.descanso = false;
         registro.falta = false;
+        registro.funcao = false;
         if (entradaInput.value) registro.entrada = entradaInput.value;
         if (saidaAlmocoInput.value) registro.saidaAlmoco = saidaAlmocoInput.value;
         if (entradaAlmocoInput.value) registro.entradaAlmoco = entradaAlmocoInput.value;
@@ -186,6 +211,7 @@ pontoForm.addEventListener('submit', function(e) {
     feriasInput.checked = false;
     descansoInput.checked = false;
     faltaInput.checked = false;
+    funcaoInput.checked = false;
     pontoForm.removeAttribute('data-edit');
 });
 
@@ -251,9 +277,9 @@ exportarPDF.addEventListener('click', function() {
 });
 
 enviarEmail.addEventListener('click', function() {
-    let csv = 'Nome,Data,Entrada,Saída Almoço,Entrada Almoço,Saída,Folga,Férias,Descanso,Falta\n';
+    let csv = 'Nome,Data,Entrada,Saída Almoço,Entrada Almoço,Saída,Folga,Férias,Descanso,Falta,Função\n';
     registros.forEach(reg => {
-        csv += `${reg.nome},${reg.data},${reg.entrada || ''},${reg.saidaAlmoco || ''},${reg.entradaAlmoco || ''},${reg.saida || ''},${reg.folga ? 'Sim' : ''},${reg.ferias ? 'Sim' : ''},${reg.descanso ? 'Sim' : ''},${reg.falta ? 'Sim' : ''}\n`;
+        csv += `${reg.nome},${reg.data},${reg.entrada || ''},${reg.saidaAlmoco || ''},${reg.entradaAlmoco || ''},${reg.saida || ''},${reg.folga ? 'Sim' : ''},${reg.ferias ? 'Sim' : ''},${reg.descanso ? 'Sim' : ''},${reg.falta ? 'Sim' : ''},${reg.funcao ? 'Sim' : ''}\n`;
     });
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
