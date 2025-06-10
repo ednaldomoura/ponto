@@ -10,12 +10,20 @@ const feriasInput = document.getElementById('ferias');
 const descansoInput = document.getElementById('descanso');
 const faltaInput = document.getElementById('falta');
 const funcaoInput = document.getElementById('funcao');
+const funcaoCheck = document.getElementById('funcaoCheck');
+const funcaoTexto = document.getElementById('funcaoTexto');
 const tabelaPonto = document.getElementById('tabelaPonto').getElementsByTagName('tbody')[0];
 const exportarCSV = document.getElementById('exportarCSV');
 const exportarPDF = document.getElementById('exportarPDF');
 const enviarEmail = document.getElementById('enviarEmail');
 
 let registros = JSON.parse(localStorage.getItem('registrosPonto') || '[]');
+
+// Exibe o campo de texto da função apenas se o checkbox estiver marcado
+funcaoCheck.addEventListener('change', function() {
+    funcaoTexto.style.display = funcaoCheck.checked ? 'block' : 'none';
+    if (!funcaoCheck.checked) funcaoTexto.value = '';
+});
 
 function renderTabela() {
     tabelaPonto.innerHTML = '';
@@ -58,7 +66,7 @@ function renderTabela() {
         } else if (reg.funcao) {
             const funcaoCell = row.insertCell(2);
             funcaoCell.colSpan = 4;
-            funcaoCell.textContent = 'FUNÇÃO';
+            funcaoCell.textContent = 'FUNÇÃO: ' + (reg.funcaoTexto || '');
             funcaoCell.style.color = '#6c5ce7';
             funcaoCell.style.fontWeight = 'bold';
             row.insertCell(3);
@@ -108,7 +116,9 @@ function editarRegistro(idx) {
     feriasInput.checked = !!reg.ferias;
     descansoInput.checked = !!reg.descanso;
     faltaInput.checked = !!reg.falta;
-    funcaoInput.checked = !!reg.funcao;
+    funcaoCheck.checked = !!reg.funcao;
+    funcaoTexto.style.display = reg.funcao ? 'block' : 'none';
+    funcaoTexto.value = reg.funcaoTexto || '';
     pontoForm.setAttribute('data-edit', idx);
 }
 
@@ -144,6 +154,7 @@ pontoForm.addEventListener('submit', function(e) {
         registro.descanso = false;
         registro.falta = false;
         registro.funcao = false;
+        registro.funcaoTexto = '';
         registro.entrada = '';
         registro.saidaAlmoco = '';
         registro.entradaAlmoco = '';
@@ -154,6 +165,7 @@ pontoForm.addEventListener('submit', function(e) {
         registro.descanso = false;
         registro.falta = false;
         registro.funcao = false;
+        registro.funcaoTexto = '';
         registro.entrada = '';
         registro.saidaAlmoco = '';
         registro.entradaAlmoco = '';
@@ -164,6 +176,7 @@ pontoForm.addEventListener('submit', function(e) {
         registro.folga = false;
         registro.falta = false;
         registro.funcao = false;
+        registro.funcaoTexto = '';
         registro.entrada = '';
         registro.saidaAlmoco = '';
         registro.entradaAlmoco = '';
@@ -174,12 +187,14 @@ pontoForm.addEventListener('submit', function(e) {
         registro.folga = false;
         registro.descanso = false;
         registro.funcao = false;
+        registro.funcaoTexto = '';
         registro.entrada = '';
         registro.saidaAlmoco = '';
         registro.entradaAlmoco = '';
         registro.saida = '';
-    } else if (funcaoInput.checked) {
+    } else if (funcaoCheck.checked) {
         registro.funcao = true;
+        registro.funcaoTexto = funcaoTexto.value.trim();
         registro.ferias = false;
         registro.folga = false;
         registro.descanso = false;
@@ -194,6 +209,7 @@ pontoForm.addEventListener('submit', function(e) {
         registro.descanso = false;
         registro.falta = false;
         registro.funcao = false;
+        registro.funcaoTexto = '';
         if (entradaInput.value) registro.entrada = entradaInput.value;
         if (saidaAlmocoInput.value) registro.saidaAlmoco = saidaAlmocoInput.value;
         if (entradaAlmocoInput.value) registro.entradaAlmoco = entradaAlmocoInput.value;
@@ -211,7 +227,9 @@ pontoForm.addEventListener('submit', function(e) {
     feriasInput.checked = false;
     descansoInput.checked = false;
     faltaInput.checked = false;
-    funcaoInput.checked = false;
+    funcaoCheck.checked = false;
+    funcaoTexto.value = '';
+    funcaoTexto.style.display = 'none';
     pontoForm.removeAttribute('data-edit');
 });
 
@@ -279,7 +297,7 @@ exportarPDF.addEventListener('click', function() {
 enviarEmail.addEventListener('click', function() {
     let csv = 'Nome,Data,Entrada,Saída Almoço,Entrada Almoço,Saída,Folga,Férias,Descanso,Falta,Função\n';
     registros.forEach(reg => {
-        csv += `${reg.nome},${reg.data},${reg.entrada || ''},${reg.saidaAlmoco || ''},${reg.entradaAlmoco || ''},${reg.saida || ''},${reg.folga ? 'Sim' : ''},${reg.ferias ? 'Sim' : ''},${reg.descanso ? 'Sim' : ''},${reg.falta ? 'Sim' : ''},${reg.funcao ? 'Sim' : ''}\n`;
+        csv += `${reg.nome},${reg.data},${reg.entrada || ''},${reg.saidaAlmoco || ''},${reg.entradaAlmoco || ''},${reg.saida || ''},${reg.folga ? 'Sim' : ''},${reg.ferias ? 'Sim' : ''},${reg.descanso ? 'Sim' : ''},${reg.falta ? 'Sim' : ''},${reg.funcao ? (reg.funcaoTexto || 'Sim') : ''}\n`;
     });
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);

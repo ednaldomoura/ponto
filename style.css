@@ -15,43 +15,112 @@ body {
 form {
     display: flex;
     flex-wrap: wrap;
-    gap: 18px;
+    gap: 12px 18px;
     margin-bottom: 18px;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: flex-end;
 }
 input[type="text"], input[type="date"], input[type="time"] {
-    flex: 1 1 180px;
+    flex: 0 1 180px;
     min-width: 160px;
+    max-width: 220px;
     padding: 10px;
     border: 1px solid #b2bec3;
     border-radius: 6px;
     font-size: 1rem;
+    box-sizing: border-box;
 }
-label[for], label[style] {
-    flex: 1 1 140px;
-    min-width: 120px;
-    margin-top: 4px;
+label[style] {
+    flex: 0 1 180px;
+    min-width: 160px;
+    max-width: 220px;
+    margin-top: 0;
+    margin-bottom: 0;
+    display: flex !important;
+    align-items: center;
+    gap: 6px;
+    height: 40px;
 }
-button {
-    background: #2980b9;
+#funcaoTexto {
+    margin-left: 8px;
+    flex: 1 1 120px;
+    min-width: 100px;
+    max-width: 180px;
+}
+button, .botoes-exportar button {
+    background: linear-gradient(90deg, #2980b9 0%, #6dd5fa 100%);
     color: #fff;
     border: none;
-    border-radius: 6px;
-    padding: 10px 18px;
+    border-radius: 8px;
+    padding: 10px 22px;
     font-size: 1rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s;
+    box-shadow: 0 2px 8px rgba(41,128,185,0.10);
+    transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+    outline: none;
 }
-button:hover {
-    background: #2573a6;
+button:hover, .botoes-exportar button:hover {
+    background: linear-gradient(90deg, #2573a6 0%, #48c6ef 100%);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(41,128,185,0.18);
+    transform: translateY(-2px) scale(1.04);
 }
-.botoes-exportar {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-    margin-bottom: 12px;
-    flex-wrap: wrap;
+button[type="submit"] {
+    background: linear-gradient(90deg, #00b894 0%, #00cec9 100%);
+    color: #fff;
+}
+button[type="submit"]:hover {
+    background: linear-gradient(90deg, #00997a 0%, #00b894 100%);
+}
+.botoes-exportar button#exportarCSV {
+    background: linear-gradient(90deg, #fdcb6e 0%, #f6e58d 100%);
+    color: #222;
+}
+.botoes-exportar button#exportarCSV:hover {
+    background: linear-gradient(90deg, #f6e58d 0%, #fdcb6e 100%);
+    color: #222;
+}
+.botoes-exportar button#exportarPDF {
+    background: linear-gradient(90deg, #e17055 0%, #ff7675 100%);
+    color: #fff;
+}
+.botoes-exportar button#exportarPDF:hover {
+    background: linear-gradient(90deg, #ff7675 0%, #e17055 100%);
+    color: #fff;
+}
+.botoes-exportar button#enviarEmail {
+    background: linear-gradient(90deg, #6c5ce7 0%, #00b894 100%);
+    color: #fff;
+}
+.botoes-exportar button#enviarEmail:hover {
+    background: linear-gradient(90deg, #00b894 0%, #6c5ce7 100%);
+    color: #fff;
+}
+/* Botões de editar/excluir na tabela */
+td button {
+    margin: 0 2px;
+    padding: 6px 14px;
+    font-size: 0.98rem;
+    border-radius: 6px;
+    font-weight: 500;
+    box-shadow: 0 1px 4px rgba(41,128,185,0.10);
+}
+td button:first-child {
+    background: linear-gradient(90deg, #fdcb6e 0%, #f6e58d 100%);
+    color: #222;
+}
+td button:first-child:hover {
+    background: linear-gradient(90deg, #f6e58d 0%, #fdcb6e 100%);
+    color: #222;
+}
+td button:last-child {
+    background: linear-gradient(90deg, #d63031 0%, #ff7675 100%);
+    color: #fff;
+}
+td button:last-child:hover {
+    background: linear-gradient(90deg, #ff7675 0%, #d63031 100%);
+    color: #fff;
 }
 table {
     width: 100%;
@@ -71,26 +140,26 @@ th {
 tr:nth-child(even) {
     background: #f1f6fa;
 }
-@media (max-width: 1300px) {
+@media (max-width: 1100px) {
     .container {
         max-width: 99vw;
+    }
+    form {
+        gap: 10px 8px;
     }
 }
 @media (max-width: 900px) {
     form {
         flex-direction: column;
         gap: 10px;
-    }
-    input[type="text"], input[type="date"], input[type="time"] {
-        min-width: 0;
-        width: 100%;
-    }
-    .botoes-exportar {
-        flex-direction: column;
-        gap: 6px;
         align-items: stretch;
     }
-    table, th, td {
-        font-size: 0.95rem;
+    input[type="text"], input[type="date"], input[type="time"], label[style], button[type="submit"] {
+        min-width: 0;
+        max-width: 100%;
+        width: 100%;
+    }
+    #funcaoTexto {
+        max-width: 100%;
     }
 }
