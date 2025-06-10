@@ -7,6 +7,8 @@ const entradaAlmocoInput = document.getElementById('entradaAlmoco');
 const saidaInput = document.getElementById('saida');
 const folgaInput = document.getElementById('folga');
 const feriasInput = document.getElementById('ferias');
+const descansoInput = document.getElementById('descanso');
+const faltaInput = document.getElementById('falta');
 const tabelaPonto = document.getElementById('tabelaPonto').getElementsByTagName('tbody')[0];
 const exportarCSV = document.getElementById('exportarCSV');
 const exportarPDF = document.getElementById('exportarPDF');
@@ -36,6 +38,22 @@ function renderTabela() {
             folgaCell.style.fontWeight = 'bold';
             row.insertCell(3);
             row.insertCell(4);
+        } else if (reg.descanso) {
+            const descansoCell = row.insertCell(2);
+            descansoCell.colSpan = 4;
+            descansoCell.textContent = 'DESCANSO';
+            descansoCell.style.color = '#0984e3';
+            descansoCell.style.fontWeight = 'bold';
+            row.insertCell(3);
+            row.insertCell(4);
+        } else if (reg.falta) {
+            const faltaCell = row.insertCell(2);
+            faltaCell.colSpan = 4;
+            faltaCell.textContent = 'FALTA';
+            faltaCell.style.color = '#d63031';
+            faltaCell.style.fontWeight = 'bold';
+            row.insertCell(3);
+            row.insertCell(4);
         } else {
             row.insertCell(2).textContent = reg.entrada || '';
             row.insertCell(3).textContent = reg.saidaAlmoco || '';
@@ -54,6 +72,18 @@ function renderTabela() {
         btn.style.cursor = 'pointer';
         btn.onclick = function() { editarRegistro(idx); };
         editCell.appendChild(btn);
+        // Botão Excluir
+        const delBtn = document.createElement('button');
+        delBtn.textContent = 'Excluir';
+        delBtn.style.background = '#d63031';
+        delBtn.style.color = '#fff';
+        delBtn.style.border = 'none';
+        delBtn.style.borderRadius = '4px';
+        delBtn.style.padding = '4px 10px';
+        delBtn.style.cursor = 'pointer';
+        delBtn.style.marginLeft = '6px';
+        delBtn.onclick = function() { excluirRegistro(idx); };
+        editCell.appendChild(delBtn);
     });
 }
 
@@ -67,7 +97,17 @@ function editarRegistro(idx) {
     saidaInput.value = reg.saida || '';
     folgaInput.checked = !!reg.folga;
     feriasInput.checked = !!reg.ferias;
+    descansoInput.checked = !!reg.descanso;
+    faltaInput.checked = !!reg.falta;
     pontoForm.setAttribute('data-edit', idx);
+}
+
+function excluirRegistro(idx) {
+    if (confirm('Tem certeza que deseja excluir este registro?')) {
+        registros.splice(idx, 1);
+        localStorage.setItem('registrosPonto', JSON.stringify(registros));
+        renderTabela();
+    }
 }
 
 pontoForm.addEventListener('submit', function(e) {
@@ -91,6 +131,8 @@ pontoForm.addEventListener('submit', function(e) {
     if (feriasInput.checked) {
         registro.ferias = true;
         registro.folga = false;
+        registro.descanso = false;
+        registro.falta = false;
         registro.entrada = '';
         registro.saidaAlmoco = '';
         registro.entradaAlmoco = '';
@@ -98,6 +140,26 @@ pontoForm.addEventListener('submit', function(e) {
     } else if (folgaInput.checked) {
         registro.folga = true;
         registro.ferias = false;
+        registro.descanso = false;
+        registro.falta = false;
+        registro.entrada = '';
+        registro.saidaAlmoco = '';
+        registro.entradaAlmoco = '';
+        registro.saida = '';
+    } else if (descansoInput.checked) {
+        registro.descanso = true;
+        registro.ferias = false;
+        registro.folga = false;
+        registro.falta = false;
+        registro.entrada = '';
+        registro.saidaAlmoco = '';
+        registro.entradaAlmoco = '';
+        registro.saida = '';
+    } else if (faltaInput.checked) {
+        registro.falta = true;
+        registro.ferias = false;
+        registro.folga = false;
+        registro.descanso = false;
         registro.entrada = '';
         registro.saidaAlmoco = '';
         registro.entradaAlmoco = '';
@@ -105,6 +167,8 @@ pontoForm.addEventListener('submit', function(e) {
     } else {
         registro.folga = false;
         registro.ferias = false;
+        registro.descanso = false;
+        registro.falta = false;
         if (entradaInput.value) registro.entrada = entradaInput.value;
         if (saidaAlmocoInput.value) registro.saidaAlmoco = saidaAlmocoInput.value;
         if (entradaAlmocoInput.value) registro.entradaAlmoco = entradaAlmocoInput.value;
@@ -120,13 +184,15 @@ pontoForm.addEventListener('submit', function(e) {
     saidaInput.value = '';
     folgaInput.checked = false;
     feriasInput.checked = false;
+    descansoInput.checked = false;
+    faltaInput.checked = false;
     pontoForm.removeAttribute('data-edit');
 });
 
 exportarCSV.addEventListener('click', function() {
-    let csv = 'Nome,Data,Entrada,Saída Almoço,Entrada Almoço,Saída,Folga,Férias\n';
+    let csv = 'Nome,Data,Entrada,Saída Almoço,Entrada Almoço,Saída,Folga,Férias,Descanso,Falta\n';
     registros.forEach(reg => {
-        csv += `${reg.nome},${reg.data},${reg.entrada || ''},${reg.saidaAlmoco || ''},${reg.entradaAlmoco || ''},${reg.saida || ''},${reg.folga ? 'Sim' : ''},${reg.ferias ? 'Sim' : ''}\n`;
+        csv += `${reg.nome},${reg.data},${reg.entrada || ''},${reg.saidaAlmoco || ''},${reg.entradaAlmoco || ''},${reg.saida || ''},${reg.folga ? 'Sim' : ''},${reg.ferias ? 'Sim' : ''},${reg.descanso ? 'Sim' : ''},${reg.falta ? 'Sim' : ''}\n`;
     });
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
@@ -151,6 +217,8 @@ exportarPDF.addEventListener('click', function() {
     doc.text('Saída', 164, y);
     doc.text('Folga', 184, y);
     doc.text('Férias', 204, y);
+    doc.text('Descanso', 224, y);
+    doc.text('Falta', 244, y);
     y += 6;
     registros.forEach(reg => {
         doc.text(reg.nome, 14, y);
@@ -159,6 +227,10 @@ exportarPDF.addEventListener('click', function() {
             doc.text('FÉRIAS', 74, y);
         } else if (reg.folga) {
             doc.text('FOLGA', 74, y);
+        } else if (reg.descanso) {
+            doc.text('DESCANSO', 74, y);
+        } else if (reg.falta) {
+            doc.text('FALTA', 74, y);
         } else {
             doc.text(reg.entrada || '', 74, y);
             doc.text(reg.saidaAlmoco || '', 94, y);
@@ -167,6 +239,8 @@ exportarPDF.addEventListener('click', function() {
         }
         doc.text(reg.folga ? 'Sim' : '', 184, y);
         doc.text(reg.ferias ? 'Sim' : '', 204, y);
+        doc.text(reg.descanso ? 'Sim' : '', 224, y);
+        doc.text(reg.falta ? 'Sim' : '', 244, y);
         y += 6;
         if (y > 280) {
             doc.addPage();
@@ -177,21 +251,17 @@ exportarPDF.addEventListener('click', function() {
 });
 
 enviarEmail.addEventListener('click', function() {
-    // Gera o CSV como string
-    let csv = 'Nome,Data,Entrada,Saída Almoço,Entrada Almoço,Saída,Folga,Férias\n';
+    let csv = 'Nome,Data,Entrada,Saída Almoço,Entrada Almoço,Saída,Folga,Férias,Descanso,Falta\n';
     registros.forEach(reg => {
-        csv += `${reg.nome},${reg.data},${reg.entrada || ''},${reg.saidaAlmoco || ''},${reg.entradaAlmoco || ''},${reg.saida || ''},${reg.folga ? 'Sim' : ''},${reg.ferias ? 'Sim' : ''}\n`;
+        csv += `${reg.nome},${reg.data},${reg.entrada || ''},${reg.saidaAlmoco || ''},${reg.entradaAlmoco || ''},${reg.saida || ''},${reg.folga ? 'Sim' : ''},${reg.ferias ? 'Sim' : ''},${reg.descanso ? 'Sim' : ''},${reg.falta ? 'Sim' : ''}\n`;
     });
-    // Cria um blob e um link temporário para download
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
-    // Baixa o arquivo automaticamente
     const a = document.createElement('a');
     a.href = url;
     a.download = 'registros_ponto.csv';
     a.click();
     URL.revokeObjectURL(url);
-    // Abre o Gmail em nova aba
     const subject = encodeURIComponent('Registros de Ponto');
     const body = encodeURIComponent('Segue em anexo o arquivo de registros de ponto.\n\nObs: O arquivo CSV foi baixado automaticamente. Anexe-o manualmente ao e-mail no Gmail.');
     window.open(`https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${body}`,'_blank');
